@@ -744,7 +744,7 @@ configuration_impl::load_routing(const configuration_element &_element) {
 
             bool is_loaded = load_routing_host(its_routing, _element.name_)
                     && load_routing_guests(its_routing);
-
+            VSOMEIP_INFO << __func__;
             if (!is_loaded) {
                 routing_.host_.name_ = its_routing.data();
             } else {
@@ -3107,11 +3107,15 @@ configuration_impl::is_local_routing() const {
 
     bool is_local(true);
     try {
-        is_local = routing_.host_.unicast_.is_unspecified() ||
-                routing_.host_.unicast_.is_multicast();
+        bool is_unspecified = routing_.host_.unicast_.is_unspecified();
+        bool is_multicast = routing_.host_.unicast_.is_multicast();
+        VSOMEIP_INFO << "is_unspecified " << is_unspecified;
+        VSOMEIP_INFO << "unicast: " << routing_.host_.unicast_.to_string();
+        is_local = is_unspecified || is_multicast;
     } catch (...) {
+        VSOMEIP_INFO << "ERRORRR ";
     }
-
+    VSOMEIP_INFO << "is_local " << is_local;
     return is_local;
 }
 
