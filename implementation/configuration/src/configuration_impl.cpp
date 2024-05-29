@@ -808,9 +808,11 @@ configuration_impl::load_routing_host(const boost::property_tree::ptree &_tree,
         uid_t its_uid;
         gid_t its_gid;
         auto its_host = _tree.get_child("host");
+        VSOMEIP_INFO <<__func__ << "\n";
         for (auto i = its_host.begin(); i != its_host.end(); ++i) {
             std::string its_key(i->first);
             std::string its_value(i->second.data());
+            VSOMEIP_INFO <<__func__<< ":" << its_key << ":" << its_value << "\n";
             if (its_key == "name") {
                 routing_.host_.name_ = its_value;
             } else if (its_key == "uid" || its_key == "gid") {
@@ -829,6 +831,7 @@ configuration_impl::load_routing_host(const boost::property_tree::ptree &_tree,
                 }
             } else if (its_key == "unicast") {
 #if VSOMEIP_BOOST_VERSION < 106600
+                VSOMEIP_INFO << "!unicast: " << its_value;
                 routing_.host_.unicast_
                     = boost::asio::ip::address::from_string(its_value);
 #else
@@ -3107,11 +3110,15 @@ configuration_impl::is_local_routing() const {
 
     bool is_local(true);
     try {
-        is_local = routing_.host_.unicast_.is_unspecified() ||
-                routing_.host_.unicast_.is_multicast();
+        bool is_unspecified = routing_.host_.unicast_.is_unspecified();
+        bool is_multicast = routing_.host_.unicast_.is_multicast();
+        VSOMEIP_INFO << "is_unspecified " << is_unspecified;
+        VSOMEIP_INFO << "unicast: " << routing_.host_.unicast_.to_string();
+        is_local = is_unspecified || is_multicast;
     } catch (...) {
+        VSOMEIP_INFO << "ERRORRR ";
     }
-
+    VSOMEIP_INFO << "is_local " << is_local;
     return is_local;
 }
 
