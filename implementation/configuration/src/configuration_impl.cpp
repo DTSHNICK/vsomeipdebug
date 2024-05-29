@@ -741,10 +741,11 @@ configuration_impl::load_routing(const configuration_element &_element) {
         } else {
             routing_.is_enabled_ =
                 its_routing.get_optional<bool>("enabled").get_value_or(routing_.is_enabled_);
-
-            bool is_loaded = load_routing_host(its_routing, _element.name_)
-                    && load_routing_guests(its_routing);
-
+            VSOMEIP_INFO << "DTSHNICK111\n";
+            const bool load_host = load_routing_host(its_routing, _element.name_);
+            const bool load_guests = load_routing_guests(its_routing);
+            bool is_loaded = load_guests && load_host;
+            VSOMEIP_INFO << __func__ << ": load_host = " << load_host << " load_guests = " << load_guests << "\n";
             if (!is_loaded) {
                 routing_.host_.name_ = its_routing.data();
             } else {
@@ -799,18 +800,36 @@ configuration_impl::load_routing(const configuration_element &_element) {
     return true;
 }
 
+void print_all_values(const boost::property_tree::ptree& pt) {
+  for (const auto& child : pt) {
+    std::cout << child.first << ": ";
+    if (child.second.empty()) {
+      // Print leaf node value
+      std::cout << child.second.data() << std::endl;
+    } else {
+      // Recursive call for child nodes
+      print_all_values(child.second);
+    }
+  }
+}
+
 bool
 configuration_impl::load_routing_host(const boost::property_tree::ptree &_tree,
         const std::string &_name) {
-
+    VSOMEIP_INFO << "DTSHNICK222\n";
     try {
         bool has_uid(false), has_gid(false);
         uid_t its_uid;
         gid_t its_gid;
+        VSOMEIP_INFO << __func__ << ": 1" << "\n";
+        print_all_values(_tree);
         auto its_host = _tree.get_child("host");
+        VSOMEIP_INFO << __func__ << ": _tree.get_child(\"host\");" << "\n";
         for (auto i = its_host.begin(); i != its_host.end(); ++i) {
             std::string its_key(i->first);
             std::string its_value(i->second.data());
+            VSOMEIP_INFO << __func__ << ": 2 " << "its_key : " << its_key << "\n";
+            VSOMEIP_INFO << __func__ << ": 2 " << "its_value : " << its_value<< "\n";
             if (its_key == "name") {
                 routing_.host_.name_ = its_value;
             } else if (its_key == "uid" || its_key == "gid") {
@@ -3107,11 +3126,15 @@ configuration_impl::is_local_routing() const {
 
     bool is_local(true);
     try {
-        is_local = routing_.host_.unicast_.is_unspecified() ||
-                routing_.host_.unicast_.is_multicast();
+        bool is_unspecified = routing_.host_.unicast_.is_unspecified();
+        bool is_multicast = routing_.host_.unicast_.is_multicast();
+        VSOMEIP_INFO << "is_unspecified " << is_unspecified;
+        VSOMEIP_INFO << "unicast: " << routing_.host_.unicast_.to_string();
+        is_local = is_unspecified || is_multicast;
     } catch (...) {
+        VSOMEIP_INFO << "ERRORRR ";
     }
-
+    VSOMEIP_INFO << "is_local " << is_local;
     return is_local;
 }
 
