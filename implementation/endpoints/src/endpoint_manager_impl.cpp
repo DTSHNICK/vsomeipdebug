@@ -678,7 +678,7 @@ endpoint_manager_impl::create_routing_root(
                     VSOMEIP_ERROR << "endpoint_manager_impl::create_local_server unlink failed ("
                             << its_endpoint_path << "): "<< std::strerror(errno);
                 }
-                VSOMEIP_INFO << __func__ << ": Routing root @ " << its_endpoint_path;
+                VSOMEIP_INFO << __func__ << ": ! Routing root @ " << its_endpoint_path;
 
                 try {
                     _root =
@@ -704,7 +704,6 @@ endpoint_manager_impl::create_routing_root(
 #else
         ::unlink(its_endpoint_path.c_str());
         port_t port = VSOMEIP_INTERNAL_BASE_PORT;
-        VSOMEIP_INFO << __func__ << ": Routing root @ " << std::dec << port;
 
         try {
             _root =
@@ -725,9 +724,6 @@ endpoint_manager_impl::create_routing_root(
     } else {
         auto its_address = configuration_->get_routing_host_address();
         auto its_port = configuration_->get_routing_host_port();
-
-        VSOMEIP_INFO << __func__ << ": Routing root @ "
-                << its_address.to_string() << ":" << std::dec << its_port;
 
         bool create_routing_result = false;
         for (int attempt = 0; attempt < VSOMEIP_ROUTING_ROOT_RECONNECT_RETRIES; ++attempt) {
