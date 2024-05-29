@@ -3105,13 +3105,15 @@ configuration_impl::get_routing_guest_ports(uid_t _uid, gid_t _gid) const {
 bool
 configuration_impl::is_local_routing() const {
 
+    VSOMEIP_INFO << "is_local_routing";
     bool is_local(true);
     try {
         is_local = routing_.host_.unicast_.is_unspecified() ||
                 routing_.host_.unicast_.is_multicast();
     } catch (...) {
+        VSOMEIP_INFO << "ERRORRR ";
     }
-
+    VSOMEIP_INFO << "is_local " << is_local;
     return is_local;
 }
 

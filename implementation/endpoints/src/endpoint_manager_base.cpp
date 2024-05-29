@@ -31,6 +31,7 @@ endpoint_manager_base::endpoint_manager_base(
       local_port_(ILLEGAL_PORT) {
 
     is_local_routing_ = configuration_->is_local_routing();
+    VSOMEIP_INFO << "! is_local_routing_ " << its_endpoint_path;
 }
 
 std::shared_ptr<endpoint> endpoint_manager_base::create_local(client_t _client) {
